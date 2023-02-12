@@ -11,10 +11,10 @@ Import the data and look at the mean, median, max and min
 
 trips <- read.csv("C:/Users/david/Desktop/12 months of Data/trips_cleaned.csv")
 
-mean(trips$ride_length) #straight average (total ride length / rides) = 1166.875
-median(trips$ride_length) #midpoint number in the ascending array of ride lengths = 617
-max(trips$ride_length) #longest ride = 2486835
-min(trips$ride_length) #shortest ride = 0
+mean(trips$ride_length) #straight average (total ride length / rides) 
+median(trips$ride_length) #midpoint number in the ascending array of ride lengths
+max(trips$ride_length) #longest ride
+min(trips$ride_length) #shortest ride
 
 ### 3. Aggregate Data
 # See the average ride time by each day for members vs casual users
