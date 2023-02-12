@@ -1,0 +1,100 @@
+---
+title: 
+  Data Cleaning Process
+date: "`r Sys.Date()`"
+---
+
+### 1. Description
+
+```{load packages}
+Some have been used for testing purposes, so most libraries are here for referencial reasons.
+library(tidyverse)
+library(skimr)
+library(janitor)
+library(dplyr)
+library(rmdformats)
+library(knitr)
+library(lubridate)
+```
+
+### 2. Import the Data
+Taking each file and reading them by month.
+
+Feb_22 <- read.csv("C:/Users/david/Desktop/12 months of Data/12 months of Data - Copy/1.Feb2nd2022.csv")
+Mar_22 <- read.csv("C:/Users/david/Desktop/12 months of Data/12 months of Data - Copy/2.Mar2nd2022.csv")
+Apr_22 <- read.csv("C:/Users/david/Desktop/12 months of Data/12 months of Data - Copy/3.Apr6th2022.csv")
+May_22 <- read.csv("C:/Users/david/Desktop/12 months of Data/12 months of Data - Copy/4.May3rd2022.csv")
+Jun_22 <- read.csv("C:/Users/david/Desktop/12 months of Data/12 months of Data - Copy/5.Jun4th2022.csv")
+Jul_22 <- read.csv("C:/Users/david/Desktop/12 months of Data/12 months of Data - Copy/6.Jul15th2022.csv")
+Aug_22 <- read.csv("C:/Users/david/Desktop/12 months of Data/12 months of Data - Copy/7.Aug5th2022.csv")
+Sep_22 <- read.csv("C:/Users/david/Desktop/12 months of Data/12 months of Data - Copy/8.Sep8th2022.csv")
+Oct_22 <- read.csv("C:/Users/david/Desktop/12 months of Data/12 months of Data - Copy/9.Oct11th2022.csv")
+Nov_22 <- read.csv("C:/Users/david/Desktop/12 months of Data/12 months of Data - Copy/10.Nov8th2022.csv")
+Dec_22 <- read.csv("C:/Users/david/Desktop/12 months of Data/12 months of Data - Copy/11.Dec5th2022.csv")
+Jan_23 <-read.csv("C:/Users/david/Desktop/12 months of Data/12 months of Data - Copy/12.Jan3rd2023.csv")
+
+### 3. Check the data structure
+Skimming each file to make sure each file is consistent in its varibale types. Each data set puts out 9 character columns and 4 numeric. Also helps to check which columns 
+contain empty values. 
+
+skim(Feb_22)
+skim(Mar_22)
+skim(Apr_22)
+skim(May_22)
+skim(Jun_22)
+skim(Jul_22)
+skim(Aug_22)
+skim(Sep_22)
+skim(Oct_22)
+skim(Nov_22)
+skim(Dec_22)
+skim(Jan_23)
+
+### 4. Merge the data
+Merging all 12 months into a year.
+
+yearly_trips <- rbind(Feb_22,Mar_22,Apr_22,May_22,Jun_22,Jul_22,Aug_22,Sep_22,Oct_22,Nov_22,Dec_22,Jan_23)
+
+### 5. Make the dates from chr to dates
+Converting the times from characters into dates for finding the difference. Dates are Year-month-day hour-minute-second
+
+yearly_trips$started_at <- as.POSIXct(yearly_trips$started_at, format = "%Y-%m-%d %H:%M:%S")
+yearly_trips$ended_at <- as.POSIXct(yearly_trips$ended_at, format =  "%Y-%m-%d %H:%M:%S")
+
+### 6. Filter and remove null rows
+Filtering out rows that contain empty columns.
+
+filter(yearly_trips, !is.na(start_station_name) | start_station_name != "")
+filter(yearly_trips, !is.na(end_station_name) | end_station_name != "")
+filter(yearly_trips, !is.na(start_station_id) | start_station_id != "")
+filter(yearly_trips, !is.na(end_station_id) | end_station_id != "")
+
+### 7. Find the difference - ride_length
+Taking the difference in time, converting the seconds into numeric, then checking and removing any ride lengths that are negative.
+
+yearly_trips$ride_length <- difftime(yearly_trips$ended_at, yearly_trips$started_at)
+
+is.factor(yearly_trips$ride_length)
+
+yearly_trips$ride_length <- as.numeric(as.character(yearly_trips$ride_length))
+
+is.numeric(yearly_trips$ride_length)
+
+
+### 8. Weekday
+We want to find what day the user started and assign that day the apporpriate number value. Sun = 1 and Sat = 7
+
+yearly_trips$day_of_week <- as.POSIXct(yearly_trips$started_at, format = "%Y-%m-%d")
+yearly_trips$weekday <- weekdays(yearly_trips$day_of_week)
+yearly_trips$day_of_week <- wday(yearly_trips$day_of_week)
+
+
+trips_cleaned <- yearly_trips %>%
+  filter(!(ride_length < 0))
+
+tibble(yearly_trips$ride_length)
+
+### 9. Save file
+Save the data file
+ 
+write.csv(trips_cleaned, "C:\\Users\\david\\Desktop\\12 months of Data\\trips_cleaned.csv", row.names=FALSE)
