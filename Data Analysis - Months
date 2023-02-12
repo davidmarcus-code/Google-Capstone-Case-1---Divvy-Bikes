@@ -1,0 +1,37 @@
+---
+title: 
+  Data Analysis Process - Months
+date: "`r Sys.Date()`"
+---
+
+### 1. Library
+library(tidyverse)
+library(lubridate)
+
+### 2. Basic Information
+After doing data week by week, I made another script to analyse each month to get an idea of the seasons. 
+
+trips <- read.csv("C:/Users/david/Desktop/12 months of Data/trips_cleaned.csv") #Import Data
+
+trips$started_at <- as.POSIXct(trips$started_at, format = "%Y-%m-%d %H:%M:%S") #Reformat Dates
+
+3. Month
+First I'm going to format the months into a column, then change the data type into numerics, then get the abreviations of each month 
+
+trips$month <- format(trips$started_at, "%m")
+
+trips$month <- month(as.numeric(trips$month))
+
+trips$month_abr <- month.abb[trips$month] #Abreviating months from the numeric value
+
+aggregate(trips$ride_length ~ trips$member_casual + trips$month_abr, FUN = mean) 
+
+4. Visualize
+
+trips %>% 
+  group_by(member_casual, month_abr) %>% 
+  summarise(number_of_rides = n()
+            ,average_duration = mean(ride_length)) %>% 
+  arrange(member_casual, month_abr)  %>% 
+  ggplot(aes(x = month_abr, y = number_of_rides, fill = member_casual)) +
+  geom_col(position = "dodge")
