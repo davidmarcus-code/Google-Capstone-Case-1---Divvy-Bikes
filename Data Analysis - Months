@@ -27,7 +27,7 @@ trips$month_abr <- month.abb[trips$month] #Abreviating months from the numeric v
 aggregate(trips$ride_length ~ trips$member_casual + trips$month_abr, FUN = mean) 
 
 4. Visualize
-
+Take a look at the data and export the file to be used in Tableau.
 trips %>% 
   group_by(member_casual, month_abr) %>% 
   summarise(number_of_rides = n()
@@ -35,3 +35,7 @@ trips %>%
   arrange(member_casual, month_abr)  %>% 
   ggplot(aes(x = month_abr, y = number_of_rides, fill = member_casual)) +
   geom_col(position = "dodge")
+
+months <- aggregate(trips$ride_length ~ trips$member_casual + trips$month_abr, FUN = mean)
+
+write.csv(months, file = 'C:\\Users\\david\\Desktop\\12 months of Data\\months.csv')
